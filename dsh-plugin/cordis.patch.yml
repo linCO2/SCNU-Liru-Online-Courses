@@ -1,0 +1,25 @@
+# Ordered patch over the profile composition.
+# `insert:` adds new rows; entry points come from package.json exports + dsh.client.
+#
+# ⚠️ 这里**绝对不要写 config 块**。
+# 原因（已实测，且从 app.asar 里提取到了 cordis 原文）：
+#
+#   function resolveConfig(runtime, config) {
+#     if (!runtime.Config) return config;                          // 没导出 Config 就安全返回
+#     const result = runtime.Config["~standard"].validate(config);  // ← 就是这里炸
+#     ...
+#   }
+#
+#   `Config` 必须是实现 **Standard Schema** 规范的对象（要带 `~standard`）。
+#   导出普通 JSON Schema 对象 → 取 `["~standard"].validate` 时抛
+#     TypeError: Cannot read properties of undefined (reading 'validate')
+#   而该错误发生在 apply() 之前，整个 entry 直接无法激活（实测踩过）。
+#   同 profile 的 dsh-infinite-gen-2 / dsh-session-delete 都没导出 Config，一切正常。
+#
+# 所有可调参数走 host.js 里的 DEFAULT_CONFIG 缺省值。
+# 想改（接口地址 / 模型 / key / 是否开本地桥），在用户层
+#   ~/.dsh/profiles/desktop/cordis.patch.yml
+# 里按 id 覆盖 config 即可 —— host.js 的 normalizeConfig() 是宽松读取的。
+- insert:
+    - id: scnu-helper2
+      name: '@local/dsh-scnu-helper2'

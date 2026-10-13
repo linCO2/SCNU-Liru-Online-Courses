@@ -1,0 +1,31 @@
+{
+  "name": "@local/dsh-scnu-helper2",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "砺儒云课堂课程助手（DSH 侧）：给智能体提供「出题→问模型→存题库」能力，并在对话框上方显示答题助手状态徽标",
+  "license": "MIT",
+  "exports": {
+    ".": "./host.js",
+    "./client": "./client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "host.js",
+    "client.js",
+    "cordis.patch.yml",
+    "README.md"
+  ],
+  "scripts": {
+    "harness:check": "node --check host.js && node --check client.js"
+  },
+  "dsh": {
+    "client": {
+      "platform": "web",
+      "immediately": true
+    },
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    }
+  }
+}
